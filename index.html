@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ikigai • Laboratorio Gastronómico — Menú Meal Prep</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #0b0f10;
+      --panel: #0f1416;
+      --card: #0f1617;
+      --muted: #9aa3a6;
+      --muted-2: #7e8588;
+      --accent: #c7a874;
+      --glass: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.04);
+      --radius: 12px;
+      --text: #e9ecec;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 420px at 12% 10%, rgba(199,168,116,0.03), transparent 8%),
+      radial-gradient(800px 340px at 90% 90%, rgba(199,168,116,0.02), transparent 8%),
+      var(--bg);
+      color:var(--text);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px;
+    }
+
+    .wrap {
+      max-width:1200px;
+      margin:0 auto;
+    }
+
+    header.site-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      padding:16px 18px;
+      border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border:1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+    .brand {
+      display:flex; gap:14px; align-items:center;
+    }
+    .brand img{ width:64px; height:auto; border-radius:8px; }
+    .brand h1{
+      margin:0; font-family:"Playfair Display", serif; font-size:22px; letter-spacing:0.3px; color:var(--text);
+    }
+    .brand p{ margin:0; color:var(--muted); font-size:13px; }
+
+    .controls {
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    }
+    .search {
+      display:flex; align-items:center; gap:8px;
+      background:var(--glass); border:1px solid var(--glass-border); padding:10px; border-radius:10px; min-width:260px;
+    }
+    .search input{ background:transparent; border:0; outline:0; color:var(--text); font-size:14px; width:220px; }
+
+    .select {
+      background:transparent; border:1px solid var(--glass-border); color:var(--muted); padding:8px 10px; border-radius:10px; outline:0; font-weight:600;
+    }
+
+    main.content {
+      margin-top:18px;
+      padding:22px;
+      border-radius:12px;
+      border:1px solid var(--glass-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.008), transparent);
+      box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    }
+
+    .sections { display:flex; flex-direction:column; gap:18px; }
+    .section {
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border-radius:10px; border:1px solid rgba(255,255,255,0.02); overflow:hidden;
+      transform-origin: top center;
+      transition: transform .36s cubic-bezier(.2,.8,.2,1), opacity .36s ease, box-shadow .36s ease;
+      opacity:0; transform:translateY(12px);
+    }
+    .section.visible { opacity:1; transform:translateY(0); }
+    .section-header {
+      display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; cursor:pointer;
+      background: linear-gradient(90deg, rgba(255,255,255,0.01), transparent);
+    }
+    .section-title { display:flex; gap:12px; align-items:center; }
+    .section-title h2 { margin:0; font-family:"Playfair Display", serif; font-size:16px; color:var(--text); }
+    .count { color:var(--muted); font-size:13px; }
+    .chev { color:var(--muted); transition: transform .28s ease; }
+
+    .section-body { padding:12px 14px 18px 14px; border-top:1px solid rgba(255,255,255,0.02); display:grid; gap:6px; }
+    .row {
+      display:grid; grid-template-columns: 1fr 96px 96px; gap:8px; align-items:center;
+      padding:12px; border-radius:8px; transition: background .18s ease;
+    }
+    .row:nth-child(odd){ background: linear-gradient(90deg, rgba(255,255,255,0.005), transparent); }
+    .row:hover { background: linear-gradient(90deg, rgba(199,168,116,0.03), transparent); }
+    .dish-name { font-weight:600; color:var(--text); font-size:14px; }
+    .price { color:var(--accent); font-weight:700; text-align:right; }
+    .peso { color:var(--muted-2); text-align:right; font-size:13px; }
+
+    .badge {
+      display:inline-grid; place-items:center; width:36px; height:36px; border-radius:8px; margin-right:6px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.02);
+      box-shadow: 0 6px 20px rgba(2,6,8,0.6);
+    }
+    .badge svg { transform-origin:center; animation: float 6s ease-in-out infinite; opacity:0.95; }
+    @keyframes float {
+      0%{ transform:translateY(0) rotate(0); }
+      50%{ transform:translateY(-6px) rotate(4deg); }
+      100%{ transform:translateY(0) rotate(0); }
+    }
+
+    /* responsive adjustments */
+    @media (max-width:980px){
+      .brand img{ width:50px; }
+      .search input{ width:140px; }
+      .row { grid-template-columns: 1fr 84px 84px; padding:10px; }
+      .header { flex-direction:column; align-items:flex-start; gap:8px; }
+      .controls { width:100%; justify-content:flex-start; gap:8px; }
+    }
+
+    /* reveal stagger */
+    .stagger > * { opacity:0; transform:translateY(10px); transition: all .42s cubic-bezier(.2,.8,.2,1); }
+    .stagger.show > * { opacity:1; transform:translateY(0); }
+    .stagger.show > *:nth-child(1){ transition-delay: 0.04s; }
+    .stagger.show > *:nth-child(2){ transition-delay: 0.08s; }
+    .stagger.show > *:nth-child(3){ transition-delay: 0.12s; }
+    .stagger.show > *:nth-child(4){ transition-delay: 0.16s; }
+    .stagger.show > *:nth-child(5){ transition-delay: 0.20s; }
+
+    @media print {
+      header.site-head, .controls { display:none; }
+      body{ background:#fff; color:#000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-head" role="banner" aria-label="Encabezado del menú">
+      <div class="brand">
+        <img src="assets/logo-white.png" alt="Ikigai logo" onerror="this.style.display='none'">
+        <div>
+          <h1>ikigai</h1>
+          <p>Laboratorio Gastronómico</p>
+        </div>
+      </div>
+
+      <div class="controls" role="region" aria-label="Controles de búsqueda y orden">
+        <div class="search" title="Buscar platillo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M21 21l-4.35-4.35" stroke="#9aa3a6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="11" cy="11" r="6" stroke="#9aa3a6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input id="search" placeholder="Buscar platillo..." aria-label="Buscar platillo">
+        </div>
+
+        <select id="sort" class="select" aria-label="Ordenar">
+          <option value="default">Predeterminado</option>
+          <option value="price-asc">Precio ↑</option>
+          <option value="price-desc">Precio ↓</option>
+          <option value="name-az">Nombre A→Z</option>
+          <option value="name-za">Nombre Z→A</option>
+        </select>
+
+        <select id="perPage" class="select" aria-label="Ítems por página">
+          <option value="all">Todos</option>
+          <option value="6">6</option>
+          <option value="12">12</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="content" role="main" aria-live="polite">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div>
+          <div style="font-family:'Playfair Display', serif; font-size:18px; font-weight:600;">Menú Meal Prep</div>
+          <div id="summary" style="color:var(--muted); font-size:13px; margin-top:4px;">Cargando...</div>
+        </div>
+      </div>
+
+      <div id="sections" class="sections" aria-label="Secciones del menú">
+        <!-- secciones generadas por JS -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    /* CSV original (sin modificar) */
+    const rawCSV = `Tipo;Platillo;Precio;Peso (grs) / Porción
+Proteínas de Autor;Pechuga de Pollo a la Plancha ;8.400;500
+Proteínas de Autor;Pollo Caribeño ;9.000;500
+Proteínas de Autor;Pollo Mechado ;6.600;500
+Proteínas de Autor;Trozos de Pollo con Salsa de Tomate ;6.600;500
+Proteínas de Autor;Pollo Empanizado ;8.900;500
+Proteínas de Autor;Albóndigas en Salsa de Tomate ;6.000;500
+Proteínas de Autor;Tortas de Carne ;6.000;500
+Proteínas de Autor;Carne Molida Arreglada ;6.000;500
+Proteínas de Autor;Trozos de Carne Res con Hongos ;10.800;500
+Proteínas de Autor;Carne Mechada ;9.000;500
+Proteínas de Autor;Arrachera ;9.600;500
+Proteínas de Autor;Entraña ;9.600;500
+Proteínas de Autor;Dorado al Curry Rojo ;13.800;500
+Proteínas de Autor;Dorado al Curry Verde ;13.800;500
+Proteínas de Autor;Filete de Salmón ;14.400;500
+Proteínas de Autor;Filete de Corvina ;16.800;500
+Arroces, Granos y Cereales;Arroz con Pollo ;5.400;500
+Arroces, Granos y Cereales;Rice and Beans ;8.400;500
+Arroces, Granos y Cereales;Arroz Frito Estilo Chino ;4.800;500
+Arroces, Granos y Cereales;Gallo Pinto ;3.600;500
+Arroces, Granos y Cereales;Lentejas con Pollo ;4.000;500
+Arroces, Granos y Cereales;Garbanzos con Pollo ;3.200;500
+Pastas de Autor;Lasagna Carne Salsa Roja ;9.000;4 Porciones
+Pastas de Autor;Lasagna Pollo Salsa Roja ;8.400;4 Porciones
+Pastas de Autor;Lasagna Pollo Salsa Blanca ;10.200;4 Porciones
+Cremas y Broths;Crema de Tomate ;7.600;1000
+Cremas y Broths;Crema Ayote ;3.600;1000
+Cremas y Broths;Caldo Hueso ;3.100;500
+Cremas y Broths;Caldo Pollo ;3.100;500
+Vegetales, Purés y Picadillos de la Casa;Vegetales Asados ;3.600;500
+Vegetales, Purés y Picadillos de la Casa;Vegetales al Vapor ;3.600;500
+Vegetales, Purés y Picadillos de la Casa;Ratatouille ;4.800;500
+Vegetales, Purés y Picadillos de la Casa;Puré de Papa ;4.200;500
+Vegetales, Purés y Picadillos de la Casa;Puré de Camote ;3.600;500
+Vegetales, Purés y Picadillos de la Casa;Papas Mini al Romero y Ajo ;4.200;500
+Vegetales, Purés y Picadillos de la Casa;Picadillo Chayote con Carne Molida ;4.800;500
+Vegetales, Purés y Picadillos de la Casa;Picadillo Papas con Chorizo ;5.400;500
+Salsas Artesanales;Salsa Pomodoro ;5.000;500
+Salsas Artesanales;Salsa Arrabiata ;5.400;500
+Salsas Artesanales;Salsa Amatriciana ;6.400;500
+Salsas Artesanales;Pesto Genovés ;6.900;500
+Salsas Artesanales;Bechamel Hongos ;6.100;500
+Salsas Artesanales;Pesto Cremoso ;5.600;500
+Salsas Artesanales;Salsa Ragu ;6.700;500
+Salsas Artesanales;Salsa Bolognese ;7.200;500`;
+
+    function parseCSV(text){
+      const lines = text.split(/\r?\n/).filter(l => l.trim().length>0);
+      const header = lines[0].split(';');
+      const rows = lines.slice(1).map(line => {
+        const cols = line.split(';');
+        return {
+          tipo: cols[0] ?? '',
+          platillo: cols[1] ?? '',
+          precio: cols[2] ?? '',
+          peso_raw: cols[3] ?? ''
+        };
+      });
+      return rows;
+    }
+
+    const items = parseCSV(rawCSV);
+
+    function displayPeso(p){
+      if(!p) return '';
+      const trimmed = p.trim();
+      if(trimmed === '500' || trimmed === '1000') return `${trimmed} grs`;
+      return trimmed;
+    }
+
+    function groupByTipo(rows){
+      const map = new Map();
+      rows.forEach(r => {
+        if(!map.has(r.tipo)) map.set(r.tipo, []);
+        map.get(r.tipo).push(r);
+      });
+      return map;
+    }
+
+    const grouped = groupByTipo(items);
+
+    // UI references
+    const sectionsEl = document.getElementById('sections');
+    const searchEl = document.getElementById('search');
+    const sortEl = document.getElementById('sort');
+    const perPageEl = document.getElementById('perPage');
+    const summaryEl = document.getElementById('summary');
+
+    let currentSearch = '';
+    let currentSort = 'default';
+    let perPage = 'all';
+
+    function precioToNumber(p){
+      if(!p) return 0;
+      return Number(p.replace(/\./g,''));
+    }
+
+    function sortItems(arr, mode){
+      const copy = [...arr];
+      if(mode === 'price-asc') copy.sort((a,b) => precioToNumber(a.precio) - precioToNumber(b.precio));
+      else if(mode === 'price-desc') copy.sort((a,b) => precioToNumber(b.precio) - precioToNumber(a.precio));
+      else if(mode === 'name-az') copy.sort((a,b) => a.platillo.localeCompare(b.platillo));
+      else if(mode === 'name-za') copy.sort((a,b) => b.platillo.localeCompare(a.platillo));
+      return copy;
+    }
+
+    function renderSections(){
+      // Filter & sort across all items (no sidebar)
+      let visible = items.filter(it => {
+        if(currentSearch && !it.platillo.toLowerCase().includes(currentSearch.toLowerCase())) return false;
+        return true;
+      });
+
+      visible = sortItems(visible, currentSort);
+
+      summaryEl.textContent = `${visible.length} platillos disponibles`;
+
+      // group by tipo
+      const map = new Map();
+      visible.forEach(it => {
+        if(!map.has(it.tipo)) map.set(it.tipo, []);
+        map.get(it.tipo).push(it);
+      });
+
+      sectionsEl.innerHTML = '';
+
+      for(const [tipo, arr] of map){
+        const section = document.createElement('section');
+        section.className = 'section';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.innerHTML = `
+          <div class="section-title">
+            <div class="badge" aria-hidden="true">${sectionIconSVG()}</div>
+            <div>
+              <h2>${tipo}</h2>
+              <div class="count">${arr.length} artículos</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="small">Ver</div>
+            <div class="chev" aria-hidden="true">▾</div>
+          </div>
+        `;
+        const body = document.createElement('div');
+        body.className = 'section-body stagger';
+
+        let shown = arr;
+        if(perPage !== 'all'){ const n = parseInt(perPage,10); shown = arr.slice(0,n); }
+
+        shown.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = `<div class="dish-name">${item.platillo}</div><div class="price">${item.precio}</div><div class="peso">${displayPeso(item.peso_raw)}</div>`;
+          body.appendChild(row);
+        });
+
+        header.addEventListener('click', () => {
+          const expanded = body.style.display !== 'none';
+          if(expanded){
+            body.style.display = 'none';
+            header.querySelector('.chev').style.transform = 'rotate(-90deg)';
+          } else {
+            body.style.display = 'grid';
+            header.querySelector('.chev').style.transform = 'rotate(0deg)';
+            setTimeout(()=> body.classList.add('show'), 30);
+          }
+        });
+
+        body.style.display = 'grid';
+        section.appendChild(header);
+        section.appendChild(body);
+        sectionsEl.appendChild(section);
+      }
+
+      if(sectionsEl.innerHTML.trim() === ''){
+        sectionsEl.innerHTML = `<div style="padding:28px; text-align:center; color:var(--muted)">No se encontraron platillos con esos criterios.</div>`;
+      }
+
+      // reveal animation
+      const sectionEls = Array.from(sectionsEl.querySelectorAll('.section'));
+      sectionEls.forEach((s, i) => {
+        setTimeout(()=> s.classList.add('visible'), 60 + i*60);
+        const staggerBody = s.querySelector('.stagger');
+        if(staggerBody) setTimeout(()=> staggerBody.classList.add('show'), 160 + i*60);
+      });
+    }
+
+    function sectionIconSVG(){
+      return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l2.9 5.9L21 9.2l-4.5 4.1L17.8 21 12 17.7 6.2 21l1.3-7.7L3 9.2l6.1-1.3L12 2z" stroke="#d7c2a0" stroke-width="0.6" fill="rgba(199,168,116,0.06)"/></svg>`;
+    }
+
+    // initial render
+    renderSections();
+
+    // listeners
+    searchEl.addEventListener('input', (e) => {
+      currentSearch = e.target.value;
+      renderSections();
+    });
+    sortEl.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderSections();
+    });
+    perPageEl.addEventListener('change', (e) => {
+      perPage = e.target.value;
+      renderSections();
+    });
+
+    // keyboard: focus search with '/'
+    document.addEventListener('keydown', (e) => {
+      if(e.key === '/' && document.activeElement !== searchEl){
+        e.preventDefault();
+        searchEl.focus();
+      }
+    });
+  </script>
+</body>
+</html>
